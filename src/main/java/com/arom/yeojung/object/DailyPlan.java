@@ -30,4 +30,6 @@ public class DailyPlan {
   @Column(nullable = false)
   private LocalDate dailyPlanDate;
 
+  private int tripDayNumber;
+
 }

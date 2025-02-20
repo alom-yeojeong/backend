@@ -8,8 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,8 +42,16 @@ public class SubPlan extends BaseTimeEntity {
 
   private LocalTime subPlanTime;
 
-  @Column(nullable = false)
-  private Long subPlanAuthorId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "createdBy", nullable = false, updatable = false)
+  private User createdBy;
 
+  @ManyToMany
+  @JoinTable(
+      name = "sub_plan_updaters",
+      joinColumns = @JoinColumn(name = "sub_plan_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id")
+  )
+  private Set<User> updaters = new HashSet<>();
 
 }

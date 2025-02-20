@@ -1,10 +1,14 @@
 package com.arom.yeojung.object;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,4 +41,8 @@ public class User extends BaseTimeEntity{
 
   // 프로필 사진 URL
   private String profileImageUrl;
+
+  // 중간 엔티티 UserPlan과 연결
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<UserPlan> plans = new ArrayList<>();
 }

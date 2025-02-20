@@ -1,11 +1,15 @@
 package com.arom.yeojung.object;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +36,7 @@ public class TotalPlan {
 
   private int travelDuration;
 
-  //Todo: uer totalplan 중간 엔티티 만들기
+  @OneToMany(mappedBy = "totalPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<UserPlan> members = new ArrayList<>();
 
 }
