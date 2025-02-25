@@ -31,6 +31,8 @@ public class Diary {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private Long CommentCount;
+
     //조회수
     private Long viewCount;
 
