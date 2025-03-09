@@ -14,8 +14,6 @@ public class DiaryDto{
 
     private Long userId;
     private String title;
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
     private Long viewCount;
     private Long commentCount;
     private Long likeCount;

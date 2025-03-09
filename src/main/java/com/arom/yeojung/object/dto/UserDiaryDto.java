@@ -11,5 +11,4 @@ import java.time.LocalDateTime;
 public class UserDiaryDto extends BaseTimeEntity {
     private Long userId;
     private Long diaryId;
-    private LocalDateTime createdDate;
 }

@@ -1,7 +1,7 @@
 package com.arom.yeojung.repository;
 
-import com.arom.yeojung.object.dto.user.FriendRequest;
-import com.arom.yeojung.object.dto.user.FriendStatus;
+import com.arom.yeojung.object.FriendRequest;
+import com.arom.yeojung.object.constants.FriendStatus;
 import com.arom.yeojung.object.User;
 import java.util.List;
 import java.util.Optional;

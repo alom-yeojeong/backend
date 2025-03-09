@@ -1,38 +1,37 @@
 package com.arom.yeojung.object;
 
+import com.arom.yeojung.object.dto.CommentDto;
 import com.fasterxml.jackson.databind.annotation.EnumNaming;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
+@Table(name = "comment")
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    @Column(name = "comment_id")
+    private Long commentId;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_Id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "diaryId", nullable = false)
+    @JoinColumn(name = "diary_Id", nullable = false)
     private Diary diary;
 
     private String content;
 
     public static CommentDto EntityToDto(Comment comment) {
         CommentDto commentDto = new CommentDto();
-        commentDto.setUserId(comment.getUser().getId());
+        commentDto.setUserId(comment.getUser().getUserId());
         commentDto.setContent(comment.getContent());
-        commentDto.setCreatedAt(comment.getCreatedDate());
         return commentDto;
     }
 }

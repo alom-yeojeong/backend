@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface DiaryContentRepository extends JpaRepository<DiaryContent, Long> {
-    public List<DiaryContent> findByDiaryId(Long diaryId);
+    public List<DiaryContent> findByDiary_DiaryId(Long diaryId);
 }

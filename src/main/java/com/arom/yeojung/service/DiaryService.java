@@ -81,11 +81,9 @@ public class DiaryService {
     }
 
     //다이어리 조회
-    public DiaryDto getDiary(Long diaryId, User currentUser) {
+    public DiaryDto getDiary(Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
-
-        validateAuthorization(diary, currentUser);
 
         return Diary.EntityToDto(diary);
     }
@@ -142,6 +140,8 @@ public class DiaryService {
         Diary diary = diaryRepository.findById(diaryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
+        validateAuthorization(diary, currentUser);
+
         File ThumbnailFile = fileS3UploadService.uploadAndSaveFile(file);
         diary.setThumbnailFile(ThumbnailFile);
         return ThumbnailFile;
@@ -171,5 +171,11 @@ public class DiaryService {
 
         //다이어리 컨텐츠들도 모두 삭제
         diaryRepository.delete(diary);
+    }
+    // 권한 검증 로직 (사용자가 작성한 다이어리인지 확인)
+    private void validateAuthorization(Diary diary, User currentUser) {
+        if (!diary.getUser().equals(currentUser)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
     }
 }

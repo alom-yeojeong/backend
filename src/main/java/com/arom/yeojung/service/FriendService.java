@@ -1,10 +1,9 @@
 package com.arom.yeojung.service;
 
-import com.arom.yeojung.object.dto.user.FriendRequest;
-import com.arom.yeojung.object.dto.user.FriendStatus;
-import com.arom.yeojung.object.dto.user.Friendship;
+import com.arom.yeojung.object.FriendRequest;
+import com.arom.yeojung.object.Friendship;
 import com.arom.yeojung.object.User;
-import com.arom.yeojung.object.dto.user.FriendDto;
+import com.arom.yeojung.object.constants.FriendStatus;
 import com.arom.yeojung.object.dto.user.UserDto;
 import com.arom.yeojung.repository.FriendRequestRepository;
 import com.arom.yeojung.repository.FriendshipRepository;
@@ -49,18 +48,21 @@ public class FriendService {
     log.info("친구 요청을 보냈습니다. sender: {}, receiver: {}", senderId, receiverId);
   }
 
-  // 친구 요청 수락
+  // 친구 요청 수락 (사용자에게 보낸 요청)
   @Transactional
-  public void acceptFriendRequest(Long requestId) {
-    FriendRequest request = friendRequestRepository.findByFriendRequestId(requestId)
+  public void acceptFriendRequest(User user, Long senderId) {
+    User sender = userRepository.findByUserId(senderId)
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+    FriendRequest request = friendRequestRepository.findBySenderAndReceiver(sender, user)
         .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
     request.setStatus(FriendStatus.ACCEPTED);
     friendRequestRepository.save(request);
 
     Friendship friendship = Friendship.builder()
-        .user1(request.getSender())
-        .user2(request.getReceiver())
+        .user1(sender)
+        .user2(user)
         .build();
     friendshipRepository.save(friendship);
 
@@ -69,8 +71,11 @@ public class FriendService {
 
   // 친구 요청 거절
   @Transactional
-  public void rejectFriendRequest(Long requestId) {
-    FriendRequest request = friendRequestRepository.findById(requestId)
+  public void rejectFriendRequest(User user, Long senderId) {
+    User sender = userRepository.findByUserId(senderId)
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+    FriendRequest request = friendRequestRepository.findBySenderAndReceiver(sender, user)
         .orElseThrow(() -> new CustomException(ErrorCode.REQUEST_NOT_FOUND));
 
     request.setStatus(FriendStatus.REJECTED);
@@ -81,27 +86,33 @@ public class FriendService {
 
   // 사용자에게 친구 요청 보낸 사용자 조회
   @Transactional(readOnly = true)
-  public List<UserDto> getFriendRequest(Long userId) {
-    User user = userRepository.findByUserId(userId)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+  public List<UserDto> getFriendRequest(User user) {
     List<FriendRequest> requests = friendRequestRepository.findByReceiverAndStatus(user, FriendStatus.PENDING);
 
     return requests.stream().map(request -> UserDto.builder()
-        .username(request.getSender().getUsername())
-        .nickname(request.getSender().getNickname())
-        .profileImageUrl(request.getSender().getProfileImageUrl())
-        .build())
+            .username(request.getSender().getUsername())
+            .nickname(request.getSender().getNickname())
+            .profileImageUrl(request.getSender().getProfileImageUrl())
+            .build())
         .collect(Collectors.toList());
   }
 
   // 사용자의 친구 리스트
   @Transactional(readOnly = true)
-  public List<FriendDto> getFriendList(Long userId) {
-    List<Friendship> friends = friendshipRepository.findFriendshipByUserId(userId);
-    return friends.stream().map(friend -> FriendDto.builder()
-        .user1(friend.getUser1())
-        .user2(friend.getUser2())
-        .build())
+  public List<UserDto> getFriendList(User user) {
+    List<Friendship> friends = friendshipRepository.findByUser1_UserIdOrUser2_UserId(user.getUserId(), user.getUserId());
+
+    return friends.stream()
+        .map(friend -> friend.getUser1().getUserId().equals(user.getUserId()) ? friend.getUser2() : friend.getUser1()) // User 가 아닌 사용자를 선택
+        .map(this::userToUserDto)
         .collect(Collectors.toList());
+  }
+
+  private UserDto userToUserDto(User user) {
+    return UserDto.builder()
+        .username(user.getUsername())
+        .nickname(user.getNickname())
+        .profileImageUrl(user.getProfileImageUrl())
+        .build();
   }
 }

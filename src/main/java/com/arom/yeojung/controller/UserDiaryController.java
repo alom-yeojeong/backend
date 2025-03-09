@@ -1,9 +1,11 @@
 package com.arom.yeojung.controller;
 
+import com.arom.yeojung.object.User;
 import com.arom.yeojung.object.dto.UserDiaryDto;
 import com.arom.yeojung.service.UserDiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +36,9 @@ public class UserDiaryController {
 
     //사용자가 다이어리에서 나가기
     @DeleteMapping()
-    public ResponseEntity<String> removeUserFromDiary(@RequestParam Long userId, @RequestParam Long diaryId) {
-        return ResponseEntity.ok(userDiaryService.removeUerFromDiary(userId, diaryId));
+    public ResponseEntity<String> removeUserFromDiary(@RequestParam Long userId,
+                                                      @RequestParam Long diaryId,
+                                                      @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userDiaryService.removeUerFromDiary(userId, diaryId, currentUser));
     }
 }

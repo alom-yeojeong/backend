@@ -12,6 +12,4 @@ public class CommentDto {
     private Long userId;
     private Long diaryId;
     private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

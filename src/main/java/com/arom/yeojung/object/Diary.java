@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(name = "diary")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,10 +17,11 @@ import java.util.stream.Collectors;
 public class Diary extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    @Column(name = "diary_id")
+    private Long diaryId;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
     @OneToOne
@@ -57,12 +59,10 @@ public class Diary extends BaseTimeEntity{
         DiaryDto dto = new DiaryDto();
         dto.setTitle(diary.title);
         dto.setStatus(diary.status);
-        dto.setCreatedDate(diary.getCreatedDate());
-        dto.setUpdatedDate(diary.getUpdatedDate());
         dto.setViewCount(diary.viewCount);
         dto.setCommentCount(diary.commentCount);
         dto.setLikeCount(diary.likeCount);
-        dto.setUserId(diary.user.getId());
+        dto.setUserId(diary.user.getUserId());
 
         //컨텐츠 리스트를 컨텐츠 디티오로 변환하여 저장
         /*List<DiaryContentDto> contentDtos = diary.getContents()
@@ -77,5 +77,6 @@ public class Diary extends BaseTimeEntity{
             this.contents = new ArrayList<>();
         }
         this.contents.add(diarycontent);
+        diarycontent.setDiary(this);
     }
 }

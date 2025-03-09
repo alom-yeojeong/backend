@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "user_diary")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,21 +19,21 @@ public class UserDiary extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    @Column(name = "user_diary_id")
+    private Long userDiaryId;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "diaryId", nullable = false)
+    @JoinColumn(name = "diary_Id", nullable = false)
     private Diary diary;
 
     public static UserDiaryDto EntityToDto(UserDiary userDiary) {
         UserDiaryDto dto = new UserDiaryDto();
-        dto.setCreatedDate(userDiary.getCreatedDate());
-        dto.setUserId(userDiary.getUser().getId());
-        dto.setDiaryId(userDiary.getDiary().getId());
+        dto.setUserId(userDiary.getUser().getUserId());
+        dto.setDiaryId(userDiary.getDiary().getDiaryId());
         return dto;
     }
 }

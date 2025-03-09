@@ -22,6 +22,7 @@ public class AuthService {
 
         String username = authDto.getUsername();
         String password = authDto.getPassword();
+        String nickname = authDto.getNickname();
 
         Boolean isExist = userRepository.existsByUsername(username);
 
@@ -32,7 +33,8 @@ public class AuthService {
         User data = new User();
 
         data.setUsername(username);
-        data.setPassword(bCryptPasswordEncoder.encode(password)); // 암호화 진행 후 주입
+        data.setPassword(bCryptPasswordEncoder.encode(password));
+        data.setNickname(nickname);
 
         userRepository.save(data);
     }

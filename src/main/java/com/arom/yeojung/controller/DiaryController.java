@@ -2,15 +2,26 @@ package com.arom.yeojung.controller;
 
 import com.arom.yeojung.object.DiaryStatus;
 import com.arom.yeojung.object.File;
+import com.arom.yeojung.object.User;
 import com.arom.yeojung.object.dto.DiaryContentDto;
 import com.arom.yeojung.object.dto.DiaryDto;
 import com.arom.yeojung.service.DiaryContentService;
 import com.arom.yeojung.service.DiaryService;
-import com.arom.yeojung.service.FileS3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,7 +32,6 @@ import java.util.List;
 public class DiaryController {
     private final DiaryService diaryService;
     private final DiaryContentService diaryContentService;
-    private final FileS3UploadService fileS3UploadService;
 
     //다이어리 생성 Create
     @PostMapping
@@ -43,8 +53,9 @@ public class DiaryController {
 
     //다이어리 수정 Update
     @PutMapping("/{diaryId}")
-    public ResponseEntity<DiaryDto> updateDiary(@PathVariable Long diaryId, @RequestBody DiaryDto diaryDto) {
-        return ResponseEntity.ok((diaryService.updateDiary(diaryId, diaryDto)));
+    public ResponseEntity<DiaryDto> updateDiary(@PathVariable Long diaryId, @RequestBody DiaryDto diaryDto,
+                                                @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok((diaryService.updateDiary(diaryId, diaryDto, currentUser)));
     }
 
     //다이어리 제목 수정
@@ -65,8 +76,9 @@ public class DiaryController {
 
     //다이어리 썸네일 변경(새로운 사진으로 변경)
     @PutMapping("{diaryId}/thumbnail")
-    public ResponseEntity<File> updateDiaryThumbnail(@PathVariable Long diaryId, @ModelAttribute MultipartFile file) {
-        return ResponseEntity.ok(diaryService.updateDiaryThumbnailNew(diaryId, file));
+    public ResponseEntity<File> updateDiaryThumbnail(@PathVariable Long diaryId, @ModelAttribute MultipartFile file,
+                                                     @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(diaryService.updateDiaryThumbnailNew(diaryId, file, currentUser));
     }
 
     //다이어리 썸네일 변경(원래 있던 사진으로 변경)
@@ -78,8 +90,9 @@ public class DiaryController {
 
     //다이어리 삭제 Delete
     @DeleteMapping("/{diaryId}")
-    public ResponseEntity<String> deleteDiary(@PathVariable Long diaryId) {
-        diaryService.deleteDiary(diaryId);
+    public ResponseEntity<String> deleteDiary(@PathVariable Long diaryId,
+                                              @AuthenticationPrincipal User currentUser) {
+        diaryService.deleteDiary(diaryId, currentUser);
         //해당 다이어리에 컨텐츠들 모두 삭제
         return ResponseEntity.ok("Diary deleted.");
     }
@@ -89,18 +102,20 @@ public class DiaryController {
     public ResponseEntity<DiaryContentDto> addDiaryContentMedia(
             @PathVariable Long diaryId,
             @ModelAttribute MultipartFile file,
-            @RequestBody DiaryContentDto diaryContentDto
+            @RequestBody DiaryContentDto diaryContentDto,
+            @AuthenticationPrincipal User currentUser
     ) {
-        return ResponseEntity.ok(diaryContentService.addDiaryContentMedia(diaryId, file, diaryContentDto));
+        return ResponseEntity.ok(diaryContentService.addDiaryContentMedia(diaryId, file, diaryContentDto, currentUser));
     }
 
     //특정 다이어리에 diaryContent 추가(텍스트나 링크)
     @PostMapping("/{diaryId}/contents/media")
     public ResponseEntity<DiaryContentDto> addDiaryContentText(
             @PathVariable Long diaryId,
-            @RequestBody DiaryContentDto diaryContentDto
+            @RequestBody DiaryContentDto diaryContentDto,
+            @AuthenticationPrincipal User currentUser
     ) {
-        return ResponseEntity.ok(diaryContentService.addDiaryContentText(diaryId, diaryContentDto));
+        return ResponseEntity.ok(diaryContentService.addDiaryContentText(diaryId, diaryContentDto, currentUser));
     }
 
     //컨텐츠 텍스트 변경
@@ -152,9 +167,10 @@ public class DiaryController {
     @DeleteMapping("/{diaryId}/contents/{contentId}")
     public ResponseEntity<String> deleteDiaryContent(
             @PathVariable Long diaryId,
-            @PathVariable Long contentId
+            @PathVariable Long contentId,
+            @AuthenticationPrincipal User currentUser
     ) {
-        diaryContentService.deleteDiaryContent(diaryId, contentId);
+        diaryContentService.deleteDiaryContent(diaryId, contentId, currentUser);
         return ResponseEntity.ok("Content deleted successfully.");
     }
 }

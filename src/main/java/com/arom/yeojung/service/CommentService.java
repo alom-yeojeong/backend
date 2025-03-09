@@ -42,7 +42,7 @@ public class CommentService {
             throw new CustomException(ErrorCode.SAVE_FAILED);
         }
 
-        return comment.EntityToDto(comment);
+        return Comment.EntityToDto(comment);
     }
 
     //댓글 조회 (작성자로)
@@ -51,13 +51,12 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         //하나의 유저에 대한 0개 이상의 댓글
-        List<Comment> comments = commentRepository.findByUserId(user);
+        List<Comment> comments = commentRepository.findByUser_UserId(user);
         if (comments.isEmpty()) {
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
-        List<CommentDto> commentDtos = comments.stream().map(Comment::EntityToDto).collect(Collectors.toList());
 
-        return commentDtos;
+        return comments.stream().map(Comment::EntityToDto).collect(Collectors.toList());
     }
 
     //댓글 조회 (다이어리로)
@@ -66,13 +65,12 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         //하나의 다이어리에 대한 0개 이상의 댓글
-        List<Comment> comments = commentRepository.findByDiaryId(diary);
+        List<Comment> comments = commentRepository.findByDiary_DiaryId(diary);
         if (comments.isEmpty()) {
             throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
-        List<CommentDto> commentDtos = comments.stream().map(Comment::EntityToDto).collect(Collectors.toList());
 
-        return commentDtos;
+        return comments.stream().map(Comment::EntityToDto).collect(Collectors.toList());
     }
 
     //댓글 수정
@@ -86,7 +84,7 @@ public class CommentService {
         comment.setContent(commentDto.getContent());
         commentRepository.save(comment);
 
-        return comment.EntityToDto(comment);
+        return Comment.EntityToDto(comment);
     }
 
     //댓글 삭제

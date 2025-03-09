@@ -38,13 +38,20 @@ public class LikeService extends BaseTimeEntity {
     }
 
     //좋아요 삭제
-    public String deleteLike(LikeDto likeDto) {
-        Like like = likeRepository.findByUserIdAndDiaryId(likeDto.getUserId(), likeDto.getDiaryId())
+    public String deleteLike(LikeDto likeDto, User currentUser) {
+        Like like = likeRepository.findByUser_UserIdAndDiary_DiaryId(likeDto.getUserId(), likeDto.getDiaryId())
                 .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
 
         validateAuthorization(like, currentUser);
 
         likeRepository.delete(like);
         return "success";
+    }
+
+    // 권한 검증 로직 (사용자가 작성한 좋아요인지 확인)
+    private void validateAuthorization(Like like, User currentUser) {
+        if (!like.getUser().equals(currentUser)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
     }
 }
