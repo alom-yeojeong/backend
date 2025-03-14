@@ -29,7 +29,12 @@ jobs:
       run: ./gradlew build
 
     - name: Run tests
-      run: ./gradlew test -Dspring.profiles.active=test
+      run: ./gradlew test -Dspring.profiles.active=test \
+                          -DDB_HOST=localhost \
+                          -DDB_NAME=test_db \
+                          -DDB_USERNAME=test_user \
+                          -DDB_PASSWORD=test_pass
+
 
 
 
