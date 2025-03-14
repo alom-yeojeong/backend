@@ -32,6 +32,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	testImplementation ("org.springframework.boot:spring-boot-starter-test")
 
 	// AWS S3 연동을 위한 새로운 AWS SDK 추가
 	implementation("software.amazon.awssdk:s3:2.20.89")
