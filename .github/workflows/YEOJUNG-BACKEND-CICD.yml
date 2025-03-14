@@ -29,9 +29,9 @@ jobs:
       run: ./gradlew build
 
     - name: Run tests
-      env:
-        SPRING_PROFILES_ACTIVE: test
-      run: ./gradlew test
+      run: ./gradlew test -Dspring.profiles.active=test
+
+
 
 
   # CD 작업
