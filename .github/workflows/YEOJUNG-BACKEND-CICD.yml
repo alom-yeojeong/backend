@@ -62,7 +62,7 @@ jobs:
           docker stop yeojung-backend || true
           docker rm yeojung-backend || true
           
-          docker run -d -p 8080:8080 --name yeojung-backend \
+          docker run -d -p 8081:8080 --name yeojung-backend \
             -e DB_HOST=${{ secrets.DB_HOST }} \
             -e DB_NAME=${{ secrets.DB_NAME }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -81,7 +81,7 @@ jobs:
         if ! curl --fail http://localhost:8080/health; then
           echo "Health check failed, rolling back..."
           docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version
-          docker run -d -p 8080:8080 --name yeojung-backend ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version
+          docker run -d -p 8081:8080 --name yeojung-backend ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version
         fi
     
     - name: Check logs after deployment
