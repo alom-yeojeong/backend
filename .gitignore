@@ -40,6 +40,9 @@ out/
 ./.github/workflows
 /.github/workflows
 
+docker-compose.yml
+
+
 ### Application.yml ###
 src/main/resources/application.yml
 src/main/resources/application.properties
