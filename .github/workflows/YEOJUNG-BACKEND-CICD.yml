@@ -2,9 +2,9 @@ name: YEOJUNG-BACKEND-CICD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   # CI 작업
@@ -12,48 +12,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-    - name: name: YEOJUNG-BACKEND-CICD
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  # CI 작업
-  ci:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew clean build -x test
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
 
   # CD 작업
   cd:
@@ -61,112 +34,53 @@ jobs:
     needs: ci
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Docker login
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build and push Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest .
-        docker push ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest
 
-    - name: Deploy to AWS EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
-          docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest && \
-          docker stop yeojung-backend || true && \
-          docker rm yeojung-backend || true && \
-          docker run -d -p 8081:8080 --name yeojung-backend \
-          -e DB_HOST='${{ secrets.DB_HOST }}' \
-          -e DB_NAME='${{ secrets.DB_NAME }}' \
-          -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
-          -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-          -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
-          ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest"
+      - name: Deploy to AWS EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
+            docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest && \
+            docker stop yeojung-backend || true && \
+            docker rm yeojung-backend || true && \
+            docker run -d -p 8081:8080 --name yeojung-backend \
+            -e DB_HOST='${{ secrets.DB_HOST }}' \
+            -e DB_NAME='${{ secrets.DB_NAME }}' \
+            -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
+            -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+            -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
+            ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest"
 
-    - name: Health check
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "curl --fail http://localhost:8081/health || exit 1"
+      - name: Health check
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "curl --fail http://localhost:8081/health || exit 1"
 
-    - name: Rollback deployment if health check fails
-      if: failure()
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
-          docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version && \
-          docker stop yeojung-backend || true && \
-          docker rm yeojung-backend || true && \
-          docker run -d -p 8081:8080 --name yeojung-backend \
-          -e DB_HOST='${{ secrets.DB_HOST }}' \
-          -e DB_NAME='${{ secrets.DB_NAME }}' \
-          -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
-          -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-          -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
-          ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version"
+      - name: Rollback deployment if health check fails
+        if: failure()
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
+            docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version && \
+            docker stop yeojung-backend || true && \
+            docker rm yeojung-backend || true && \
+            docker run -d -p 8081:8080 --name yeojung-backend \
+            -e DB_HOST='${{ secrets.DB_HOST }}' \
+            -e DB_NAME='${{ secrets.DB_NAME }}' \
+            -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
+            -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+            -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
+            ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version"
 
-    - name: Check logs after deployment
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "docker logs yeojung-backend"
-Build with Gradle
-      run: ./gradlew clean build -x test
-
-  # CD 작업
-  cd:
-    runs-on: ubuntu-latest
-    needs: ci
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Docker login
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    - name: Build and push Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest .
-        docker push ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest
-
-    - name: Deploy to AWS EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
-          docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest && \
-          docker stop yeojung-backend || true && \
-          docker rm yeojung-backend || true && \
-          docker run -d -p 8081:8080 --name yeojung-backend \
-          -e DB_HOST='${{ secrets.DB_HOST }}' \
-          -e DB_NAME='${{ secrets.DB_NAME }}' \
-          -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
-          -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-          -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
-          ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest"
-
-    - name: Health check
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "curl --fail http://localhost:8081/health || exit 1"
-
-    - name: Rollback deployment if health check fails
-      if: failure()
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "
-          docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version && \
-          docker stop yeojung-backend || true && \
-          docker rm yeojung-backend || true && \
-          docker run -d -p 8081:8080 --name yeojung-backend \
-          -e DB_HOST='${{ secrets.DB_HOST }}' \
-          -e DB_NAME='${{ secrets.DB_NAME }}' \
-          -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
-          -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-          -e JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}' \
-          ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version"
-
-    - name: Check logs after deployment
-      run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "docker logs yeojung-backend"
+      - name: Check logs after deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "docker logs yeojung-backend"
