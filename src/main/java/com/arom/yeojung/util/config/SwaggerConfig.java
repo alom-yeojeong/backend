@@ -32,11 +32,11 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("My API Docs")
                         .version("1.0")
-                        .description("API 문서 설명"))
-                .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Local 개발 서버"),
-                        new Server().url("https://3.35.38.147:8080").description("운영 서버")
-                ));
+                        .description("API 문서 설명"));
+//                .servers(List.of(
+//                        new Server().url("http://localhost:9090").description("Local 개발 서버"),
+//                        new Server().url("https://3.35.38.147:9090").description("운영 서버")
+//                ));
     }
 }
 

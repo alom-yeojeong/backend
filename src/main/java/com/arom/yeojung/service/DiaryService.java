@@ -32,7 +32,7 @@ public class DiaryService {
     public DiaryDto createDiary(DiaryDto diaryDto) {
         //dto의 uerId를 통해 UserRepository에서 사용자 검색
         User user = userRepository.findById(diaryDto.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Diary diary = new Diary();
         diary.setUser(user);
@@ -43,7 +43,7 @@ public class DiaryService {
         diary.setStatus(diaryDto.getStatus());
 
         //썸네일은 기본적으로 없는거로 설정
-        diary.setThumbnailFile(fileRepository.findAll().getFirst());
+        diary.setThumbnailFile(fileRepository.findAll().get(0));
 
         //UserDiary 자동 생성 (사용자와 다이어리 연결)
         UserDiary userDiary = new UserDiary();
@@ -83,7 +83,7 @@ public class DiaryService {
     //다이어리 조회
     public DiaryDto getDiary(Long diaryId) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         return Diary.EntityToDto(diary);
     }
@@ -98,7 +98,7 @@ public class DiaryService {
     @Transactional
     public DiaryDto updateDiary(Long diaryId, DiaryDto diaryDto, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
@@ -112,7 +112,7 @@ public class DiaryService {
     @Transactional
     public void updateDiaryTitle(Long diaryId, String title, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
@@ -125,7 +125,7 @@ public class DiaryService {
     @Transactional
     public void updateDiaryStatus(Long diaryId, DiaryStatus diaryStatus, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
@@ -138,7 +138,7 @@ public class DiaryService {
     @Transactional
     public File updateDiaryThumbnailNew(Long diaryId, MultipartFile file, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
@@ -151,10 +151,10 @@ public class DiaryService {
     @Transactional
     public File updateDiaryThumbnail(Long diaryId, Long fileId, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         File ThumbnailFile = fileRepository.findById(fileId)
-                .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
@@ -165,7 +165,7 @@ public class DiaryService {
     //다이어리 삭제
     public void deleteDiary(Long diaryId, User currentUser) {
         Diary diary = diaryRepository.findById(diaryId)
-                .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.DIARY_NOT_FOUND));
 
         validateAuthorization(diary, currentUser);
 
