@@ -40,7 +40,6 @@ out/
 ./.github/workflows
 /.github/workflows
 
-docker-compose.yml
 .env
 
 ### Application.yml ###
