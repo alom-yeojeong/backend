@@ -7,7 +7,6 @@ on:
     branches: ["main"]
 
 jobs:
-  # CI 작업
   ci:
     runs-on: ubuntu-latest
 
@@ -15,10 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
@@ -28,7 +27,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-  # CD 작업
   cd:
     runs-on: ubuntu-latest
     needs: ci
@@ -54,7 +52,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:latest && \
             docker stop yeojung-backend || true && \
             docker rm yeojung-backend || true && \
-            docker run -d -p 8081:8080 --name yeojung-backend \
+            docker run -d -p 8080:8080 --name yeojung-backend \
             -e DB_HOST='${{ secrets.DB_HOST }}' \
             -e DB_NAME='${{ secrets.DB_NAME }}' \
             -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
@@ -64,7 +62,7 @@ jobs:
 
       - name: Health check
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "curl --fail http://localhost:8081/health || exit 1"
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.AWS_EC2_IP }} "curl --fail http://localhost:8080/health || exit 1"
 
       - name: Rollback deployment if health check fails
         if: failure()
@@ -73,7 +71,7 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/yeojung-backend:previous-version && \
             docker stop yeojung-backend || true && \
             docker rm yeojung-backend || true && \
-            docker run -d -p 8081:8080 --name yeojung-backend \
+            docker run -d -p 8080:8080 --name yeojung-backend \
             -e DB_HOST='${{ secrets.DB_HOST }}' \
             -e DB_NAME='${{ secrets.DB_NAME }}' \
             -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
