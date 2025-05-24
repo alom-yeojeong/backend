@@ -56,7 +56,10 @@ public enum ErrorCode {
   CHECKLIST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 CheckList를 찾을 수 없습니다."),
 
   //Location
-  LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Location을 찾을 수 없습니다"),
+  LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Location을 찾을 수 없습니다."),
+
+  //Budget
+  BUDGET_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Budget을 찾을 수 없습니다."),
 
   //comment
   COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Comment를 찾을 수 없습니다."),
