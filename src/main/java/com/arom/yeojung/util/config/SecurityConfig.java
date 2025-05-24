@@ -46,8 +46,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomUserDetailsService customUserDetailsService) throws Exception {
 
-        http
-                .cors((cors)->cors
+        http.cors((cors)->cors
                         .configurationSource(new CorsConfigurationSource() {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -67,18 +66,12 @@ public class SecurityConfig {
                             }
                         }));
 
-        http
-                .csrf(AbstractHttpConfigurer::disable);
+        http.csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable);
 
-        http
-                .formLogin(AbstractHttpConfigurer::disable);
-
-        http
-                .httpBasic(AbstractHttpConfigurer::disable);
-
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(
                                 "/login",
                                 "/",
                                 "/join",
@@ -87,16 +80,19 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                    "/swagger-ui.html",
+
+                                    "/swagger-ui/index.html",
+
+                                   "/v3/api-docs"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
 
 
         http
-                .addFilterAt(new JWTFilter(jwtUtil, customUserDetailsService), LoginFilter.class);
-
-        http
+                .addFilterAt(new JWTFilter(jwtUtil, customUserDetailsService), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
                         UsernamePasswordAuthenticationFilter.class);
 
@@ -107,4 +103,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }

@@ -4,13 +4,14 @@ import com.arom.yeojung.object.dto.TotalPlanRequestDTO;
 import com.arom.yeojung.object.dto.TotalPlanResponseDTO;
 import com.arom.yeojung.service.TotalPlanService;
 import com.arom.yeojung.object.User;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,8 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/totalPlans")
 @RequiredArgsConstructor
-public class TotalPlanController {
+@Tag(
+    name = "총계획 관리 API",
+    description = "총계획 관리 API 제공"
+)
+public class TotalPlanController implements TotalPlanControllerDocs {
   private final TotalPlanService totalPlanService;
+
+  // TotalPlan 생성
+  @PostMapping
+  public ResponseEntity<TotalPlanResponseDTO> createTotalPlan(
+      @RequestBody @Valid TotalPlanRequestDTO requestDTO,
+      @AuthenticationPrincipal User currentUser) {
+    TotalPlanResponseDTO response = totalPlanService.createTotalPlan(requestDTO, currentUser);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 
   // 단일 TotalPlan 조회
   @GetMapping("/{totalPlanId}")
@@ -37,15 +51,6 @@ public class TotalPlanController {
   public ResponseEntity<List<TotalPlanResponseDTO>> getAllTotalPlans() {
     List<TotalPlanResponseDTO> responses = totalPlanService.getAllTotalPlans();
     return ResponseEntity.ok(responses);
-  }
-
-  // TotalPlan 생성
-  @PostMapping
-  public ResponseEntity<TotalPlanResponseDTO> createTotalPlan(
-      @RequestBody @Valid TotalPlanRequestDTO requestDTO,
-      @AuthenticationPrincipal User currentUser) {
-    TotalPlanResponseDTO response = totalPlanService.createTotalPlan(requestDTO, currentUser);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   // TotalPlan 수정

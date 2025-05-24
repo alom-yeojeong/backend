@@ -12,6 +12,8 @@ public class TotalPlanRequestDTO {
   @NotNull
   private String title;
 
+  private String totalPlanDescription;
+
   @NotNull
   private LocalDate startDate;
 
@@ -20,7 +22,8 @@ public class TotalPlanRequestDTO {
 
   private Long totalBudget;
 
-  private String totalPlanDescription;
-
   private int travelDuration;
+
+  // TODO: 여행지 받아야 함
+  // TODO: 사진 받아야 함
 }

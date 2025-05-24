@@ -9,7 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
@@ -35,9 +35,8 @@ dependencies {
 	testImplementation ("org.springframework.boot:spring-boot-starter-test")
 
 	// AWS S3 연동을 위한 새로운 AWS SDK 추가
-	implementation("software.amazon.awssdk:s3:2.20.89")
-	implementation("software.amazon.awssdk:auth:2.20.89")
-	implementation("software.amazon.awssdk:regions:2.20.89")
+	implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+	implementation ("software.amazon.awssdk:s3:2.20.0")
 
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("com.mysql:mysql-connector-j")
@@ -52,7 +51,6 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
 	testImplementation("com.h2database:h2")
-
 }
 
 tasks.withType<Test> {
