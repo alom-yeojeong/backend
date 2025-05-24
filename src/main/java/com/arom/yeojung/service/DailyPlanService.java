@@ -78,7 +78,12 @@ public class DailyPlanService {
                 .build())
             .collect(Collectors.toList());
 
-        log.info("dailyPlan 생성 성공: 첫 dailyPlanId: {}, 생성 dailyPlan 건수: {}", saved.getFirst().getDailyPlanId(), saved.size());
+        if (!saved.isEmpty()) {
+            log.info("dailyPlan 생성 성공: 첫 dailyPlanId: {}, 생성 dailyPlan 건수: {}", saved.get(0).getDailyPlanId(), saved.size());
+        } else {
+            log.warn("dailyPlan 생성 완료: 그러나 저장된 dailyPlan이 비어 있음");
+        }
+
         return dailyPlanResponseList;
     }
 
